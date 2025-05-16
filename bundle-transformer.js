@@ -1,20 +1,14 @@
 // Function to transform bundlegrid to regular bundle format on mobile
 function transformBundleGridToRegular() {
   const bundleBox = document.querySelector('.ls-recommendation-box[data-box-style="bundlegrid"]');
-  
   if (!bundleBox) return;
-  
-  // Check if already transformed
   if (bundleBox.hasAttribute('data-transformed')) return;
-  
-  // Get current bundle container
+
   const bundleContainer = bundleBox.querySelector('.ls-bundle-container');
   const currentUl = bundleBox.querySelector('.ls-ul.limespot-recommendation-box-bundle-products.ls-bundle-list-ul');
   const ctaContainer = bundleBox.querySelector('.ls-bundle-cta-container');
-  
   if (!currentUl) return;
-  
-  // Extract product data from current list items
+
   const products = Array.from(currentUl.querySelectorAll('.ls-bundle-li')).map(li => {
     const productId = li.getAttribute('data-product-identifier');
     const productTitle = li.getAttribute('data-product-title');
@@ -22,8 +16,7 @@ function transformBundleGridToRegular() {
     const originalPrice = li.getAttribute('data-original-price');
     const displayUrl = li.getAttribute('data-display-url');
     const isSelected = li.querySelector('.ls-bundle-list-item-checkbox')?.checked || false;
-    
-    // Get image info
+
     const img = li.querySelector('.ls-image');
     const imageInfo = {
       src: img.src,
@@ -32,8 +25,7 @@ function transformBundleGridToRegular() {
       title: img.title,
       sizes: img.sizes
     };
-    
-    // Get variant info
+
     const variantContainer = li.querySelector('.ls-bundle-list-item-variant-container');
     const select = variantContainer?.querySelector('select');
     const variants = select ? Array.from(select.options).map(option => ({
@@ -42,10 +34,9 @@ function transformBundleGridToRegular() {
       price: option.getAttribute('data-price'),
       originalPrice: option.getAttribute('data-original-price')
     })) : null;
-    
-    // Get current variant info
+
     const currentVariantId = select?.getAttribute('data-variant-id') || variantContainer?.querySelector('a')?.getAttribute('data-variant-id');
-    
+
     return {
       productId,
       productTitle,
@@ -59,8 +50,7 @@ function transformBundleGridToRegular() {
       isThisItem: li.classList.contains('ls-this-item')
     };
   });
-  
-  // Create new regular bundle structure
+
   const newStructure = `
     <div class="ls-ul-container limespot-recommendation-box-bundle v-align">
       <div class="ls-bundle-discount-container" style="display: block;">
@@ -72,7 +62,7 @@ function transformBundleGridToRegular() {
       <div class="limespot-recommendation-box-bundle-top-section">
         <ul class="ls-ul limespot-recommendation-box-bundle-products">
           ${products.map((product, index) => `
-            <li class="ls-bundle-li ls-no-overlay" 
+            <li class="ls-bundle-li ls-no-overlay"
                 data-product-identifier="${product.productId}"
                 data-product-title="${product.productTitle}"
                 data-price="${product.price}"
@@ -81,8 +71,8 @@ function transformBundleGridToRegular() {
               <div class="limespot-recommendation-box-bundle-item-image">
                 <a class="ls-link" data-product-identifier="${product.productId}" href="${product.displayUrl}">
                   <div class="ls-image-wrap">
-                    <img class="ls-image" 
-                         alt="${product.imageInfo.alt}" 
+                    <img class="ls-image"
+                         alt="${product.imageInfo.alt}"
                          title="${product.imageInfo.title}"
                          sizes="${product.imageInfo.sizes}"
                          srcset="${product.imageInfo.srcset}"
@@ -114,13 +104,13 @@ function transformBundleGridToRegular() {
                   <div class="ls-bundle-list-item-variant-container" data-variants-initialized="true">
                     <div class="ls-bundle-add-to-cart-select-wrap">
                       ${product.variants ? `
-                        <select class="ls-bundle-add-to-cart-select" size="1" 
-                                data-variant-id="${product.currentVariantId}" 
-                                data-price="${product.price}" 
+                        <select class="ls-bundle-add-to-cart-select" size="1"
+                                data-variant-id="${product.currentVariantId}"
+                                data-price="${product.price}"
                                 data-original-price="${product.originalPrice || 'null'}">
                           ${product.variants.map(variant => `
-                            <option data-price="${variant.price}" 
-                                    data-original-price="${variant.originalPrice || 'null'}" 
+                            <option data-price="${variant.price}"
+                                    data-original-price="${variant.originalPrice || 'null'}"
                                     value="${variant.value}"
                                     ${variant.value === product.currentVariantId ? 'selected' : ''}>
                               ${variant.text}
@@ -128,32 +118,32 @@ function transformBundleGridToRegular() {
                           `).join('')}
                         </select>
                       ` : `
-                        <a data-variant-id="${product.currentVariantId}" 
-                           data-price="${product.price}" 
-                           data-original-price="${product.originalPrice || ''}" 
-                           class="ls-bundle-add-to-cart-select" 
+                        <a data-variant-id="${product.currentVariantId}"
+                           data-price="${product.price}"
+                           data-original-price="${product.originalPrice || ''}"
+                           class="ls-bundle-add-to-cart-select"
                            style="display: none;">ADD TO CART</a>
                       `}
                     </div>
                   </div>
                   <div class="ls-price-wrap">
                     ${product.originalPrice ? `
-                      <span class="ls-original-price money" 
-                            data-numeric-value="${product.originalPrice}" 
-                            data-money-convertible="" 
-                            data-currency="CAD" 
+                      <span class="ls-original-price money"
+                            data-numeric-value="${product.originalPrice}"
+                            data-money-convertible=""
+                            data-currency="CAD"
                             data-currency-cad="$${product.originalPrice}">$${product.originalPrice}</span>
-                      <span class="ls-price money ls-sale-price" 
-                            data-numeric-value="${product.price}" 
-                            data-money-convertible="" 
-                            data-currency="CAD" 
+                      <span class="ls-price money ls-sale-price"
+                            data-numeric-value="${product.price}"
+                            data-money-convertible=""
+                            data-currency="CAD"
                             data-currency-cad="$${product.price}">$${product.price}</span>
                     ` : `
                       <span class="ls-original-price" style="display: none;" data-currency="CAD"></span>
-                      <span class="ls-price money" 
-                            data-numeric-value="${product.price}" 
-                            data-money-convertible="" 
-                            data-currency="CAD" 
+                      <span class="ls-price money"
+                            data-numeric-value="${product.price}"
+                            data-money-convertible=""
+                            data-currency="CAD"
                             data-currency-cad="$${product.price}">$${product.price}</span>
                     `}
                   </div>
@@ -165,60 +155,47 @@ function transformBundleGridToRegular() {
       </div>
     </div>
   `;
-  
-  // Replace the content
+
   bundleContainer.innerHTML = newStructure;
-  
-  // Update the box-style attribute
   bundleBox.setAttribute('data-box-style', 'bundle');
   bundleBox.setAttribute('data-transformed', 'true');
-  
-  // Add additional attributes that regular bundle has
   bundleBox.setAttribute('data-keep-hidden-after-load', 'true');
   bundleBox.setAttribute('data-bypass-standard-appearance', 'true');
   bundleBox.setAttribute('data-bypass-lazy-images', 'true');
-  
-  // Re-initialize any event listeners if needed
+
   initializeBundleEventListeners(bundleBox);
 }
 
-// Function to initialize event listeners for the new structure
 function initializeBundleEventListeners(bundleBox) {
-  // Handle checkbox changes
   const checkboxes = bundleBox.querySelectorAll('.ls-bundle-list-item-checkbox');
   checkboxes.forEach(checkbox => {
-    checkbox.addEventListener('change', function() {
+    checkbox.addEventListener('change', function () {
       const label = this.closest('label');
       label.setAttribute('data-item-selected', this.checked);
-      
-      // Update total price
       updateBundleTotal(bundleBox);
     });
   });
-  
-  // Handle variant selection changes
+
   const selects = bundleBox.querySelectorAll('.ls-bundle-add-to-cart-select');
   selects.forEach(select => {
     if (select.tagName === 'SELECT') {
-      select.addEventListener('change', function() {
+      select.addEventListener('change', function () {
         const option = this.options[this.selectedIndex];
         const price = option.getAttribute('data-price');
         const originalPrice = option.getAttribute('data-original-price');
-        
-        // Update select attributes
+
         this.setAttribute('data-variant-id', option.value);
         this.setAttribute('data-price', price);
         this.setAttribute('data-original-price', originalPrice || 'null');
-        
-        // Update price display
+
         const priceWrap = this.closest('.limespot-bundle-list-item-info').querySelector('.ls-price-wrap');
         const priceSpan = priceWrap.querySelector('.ls-price');
         const originalPriceSpan = priceWrap.querySelector('.ls-original-price');
-        
+
         priceSpan.textContent = `$${price}`;
         priceSpan.setAttribute('data-numeric-value', price);
         priceSpan.setAttribute('data-currency-cad', `$${price}`);
-        
+
         if (originalPrice && originalPrice !== 'null') {
           originalPriceSpan.textContent = `$${originalPrice}`;
           originalPriceSpan.setAttribute('data-numeric-value', originalPrice);
@@ -229,53 +206,47 @@ function initializeBundleEventListeners(bundleBox) {
           originalPriceSpan.style.display = 'none';
           priceSpan.classList.remove('ls-sale-price');
         }
-        
-        // Update list item attributes
+
         const listItem = this.closest('.ls-bundle-list-li');
         listItem.setAttribute('data-price', price);
         listItem.setAttribute('data-original-price', originalPrice || '');
-        
-        // Update total price
+
         updateBundleTotal(bundleBox);
       });
     }
   });
-  
-  // Initialize total price
+
   updateBundleTotal(bundleBox);
 }
 
-// Function to update bundle total price
 function updateBundleTotal(bundleBox) {
   const checkedItems = bundleBox.querySelectorAll('.ls-bundle-list-item-checkbox:checked');
   let total = 0;
   let originalTotal = 0;
-  
+
   checkedItems.forEach(checkbox => {
     const listItem = checkbox.closest('.ls-bundle-list-li');
     const price = parseFloat(listItem.getAttribute('data-price')) || 0;
     const originalPrice = parseFloat(listItem.getAttribute('data-original-price')) || price;
-    
+
     total += price;
     originalTotal += originalPrice;
   });
-  
-  // Update total price display
+
   const totalPriceSpan = bundleBox.querySelector('.ls-bundle-price-total');
   const originalTotalSpan = bundleBox.querySelector('.ls-bundle-original-price-total');
-  
+
   if (totalPriceSpan) {
     totalPriceSpan.textContent = `$${total.toFixed(2)}`;
     totalPriceSpan.setAttribute('data-numeric-value', total);
     totalPriceSpan.setAttribute('data-currency-cad', `$${total.toFixed(2)}`);
   }
-  
+
   if (originalTotalSpan) {
     originalTotalSpan.textContent = `$${originalTotal.toFixed(2)}`;
     originalTotalSpan.setAttribute('data-numeric-value', originalTotal);
     originalTotalSpan.setAttribute('data-currency-cad', `$${originalTotal.toFixed(2)}`);
-    
-    // Show/hide original total based on whether there's a discount
+
     if (originalTotal > total) {
       originalTotalSpan.style.display = 'inline';
       totalPriceSpan.classList.add('ls-sale-price');
@@ -286,10 +257,8 @@ function updateBundleTotal(bundleBox) {
   }
 }
 
-// Function to check screen size and apply transformation
 function handleBundleTransformation() {
   const isMobile = window.innerWidth < 800;
-  
   if (isMobile) {
     const bundleBoxes = document.querySelectorAll('.ls-recommendation-box[data-box-style="bundlegrid"]');
     bundleBoxes.forEach(box => {
@@ -300,22 +269,17 @@ function handleBundleTransformation() {
   }
 }
 
-// CSS for the transformation
 const transformationCSS = `
 @media (max-width: 799px) {
-  /* Hide bundlegrid specific styles on mobile */
   .ls-recommendation-box[data-box-style="bundlegrid"] .ls-bunlde-grid-list-item {
     display: none;
   }
-  
-  /* Show regular bundle styles on mobile */
   .ls-recommendation-box[data-box-style="bundle"] {
     display: block !important;
   }
 }
 `;
 
-// Add CSS to the page
 function addTransformationCSS() {
   if (!document.getElementById('bundle-transformation-css')) {
     const style = document.createElement('style');
@@ -325,21 +289,9 @@ function addTransformationCSS() {
   }
 }
 
-// Initialize the transformation
 function initializeBundleTransformation() {
-  addTransformationCSS();
-  
-  // Run on page load
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', handleBundleTransformation);
-  } else {
-    handleBundleTransformation();
-  }
-  
-  // Run on window resize (no debounce)
+  handleBundleTransformation();
   window.addEventListener('resize', handleBundleTransformation);
-  
-  // Run when LimeSpot boxes are loaded (if they load dynamically)
   const observer = new MutationObserver((mutations) => {
     mutations.forEach((mutation) => {
       mutation.addedNodes.forEach((node) => {
@@ -349,12 +301,15 @@ function initializeBundleTransformation() {
       });
     });
   });
-  
+
   observer.observe(document.body, {
     childList: true,
     subtree: true
   });
 }
 
-// Start the initialization
-initializeBundleTransformation();
+// Manual trigger for client stores
+window.runBundleTransformer = function () {
+  addTransformationCSS();
+  initializeBundleTransformation();
+};
